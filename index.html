@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지뢰찾기 게임</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="지뢰찾기">
+    <meta property="og:description" content="지뢰찾기 게임 페이지입니다.">
+    <meta property="og:image" content="./지뢰찾기.png">
+    <meta property="og:url" content="">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <input id="hor" type="number" placeholder="가로" value="10">
+    <input id="ver" type="number" placeholder="세로" value="10">
+    <input id="mine" type="number" placeholder="지뢰" value="20">
+    <button id="exec">실행</button>
+    <table id="table">
+        <thead>
+            <tr>
+                <td><span id="timer">0</span>초</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script src="main.js"></script>
+</body>
+</html>
