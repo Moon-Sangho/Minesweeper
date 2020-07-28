@@ -19,7 +19,7 @@ document.querySelector('#exec').addEventListener('click', function() {
     }
     console.log(shuffle); // 피셔예이츠 셔플
 
-    // 지뢰 테이블 만들기, 테이블 오른쪽 클릭 시 !, ?, '' 변환
+    // 지뢰 테이블 만들기
     for (let i = 0; i < ver; i++) {
         const arr = [];
         const tr = document.createElement('tr');
@@ -27,6 +27,7 @@ document.querySelector('#exec').addEventListener('click', function() {
         for (var j = 0; j < hor; j++) {
             arr.push(1);
             const td = document.createElement('td');
+            // 테이블 우클릭 시 !, ?, '' 변환
             td.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
                 const parentTr = e.currentTarget.parentNode;
@@ -43,6 +44,29 @@ document.querySelector('#exec').addEventListener('click', function() {
                     } else if (dataset[indexTr][indexTd] === 'X') {
                         e.currentTarget.textContent = 'X';
                     }
+                }
+            });
+            // 테이블 좌클릭 시 지뢰 표시 및 주변 지뢰 개수 표시
+            td.addEventListener('click', function(e) {
+                const parentTr = e.currentTarget.parentNode;
+                const parentTbody = e.currentTarget.parentNode.parentNode;
+                const indexTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
+                const indexTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+                if (dataset[indexTr][indexTd] === 'X') {
+                    e.currentTarget.textContent = '💣';
+                } else {
+                    const near = [
+                        dataset[indexTr][indexTd-1], dataset[indexTr][indexTd+1]    
+                    ];
+                    if (dataset[indexTr-1]) {
+                        near = near.concat(dataset[indexTr-1][indexTd-1], dataset[indexTr-1][indexTd], dataset[indexTr-1][indexTd+1]);
+                    } 
+                    if (dataset[indexTr+1]) {
+                        near = near.concat(dataset[indexTr+1][indexTd-1], dataset[indexTr+1][indexTd], dataset[indexTr+1][indexTd+1]);
+                    }
+                    e.currentTarget.textContent = near.filter(function(v) {
+                        return v === 'X';
+                    }).length;
                 }
             });
             tr.appendChild(td);
