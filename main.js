@@ -2,6 +2,7 @@ const tbody = document.querySelector('#table tbody');
 const dataset = [];
 
 document.querySelector('#exec').addEventListener('click', function() {
+    tbody.innerHTML = ''; // 실행 버튼 클릭 시 지뢰 테이블 초기화
     const hor = parseInt(document.querySelector('#hor').value);
     const ver = parseInt(document.querySelector('#ver').value);
     const mine = parseInt(document.querySelector('#mine').value);
@@ -18,7 +19,7 @@ document.querySelector('#exec').addEventListener('click', function() {
     }
     console.log(shuffle); // 피셔예이츠 셔플
 
-    // 지뢰 테이블 만들기
+    // 지뢰 테이블 만들기, 테이블 오른쪽 클릭 시 !, ?, '' 변환
     for (let i = 0; i < ver; i++) {
         const arr = [];
         const tr = document.createElement('tr');
@@ -32,9 +33,17 @@ document.querySelector('#exec').addEventListener('click', function() {
                 const parentTbody = e.currentTarget.parentNode.parentNode;
                 const indexTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 const indexTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
-                console.log(parentTr, parentTbody, e.currentTarget, indexTd, indexTr);
-                e.currentTarget.textContent = '!';
-                dataset[indexTr][indexTd] = '!'; 
+                if (e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
+                    e.currentTarget.textContent = '!';
+                } else if (e.currentTarget.textContent === '!') {
+                    e.currentTarget.textContent = '?';
+                } else if (e.currentTarget.textContent === '?') {
+                    if (dataset[indexTr][indexTd] === 1) {
+                        e.currentTarget.textContent = '';
+                    } else if (dataset[indexTr][indexTd] === 'X') {
+                        e.currentTarget.textContent = 'X';
+                    }
+                }
             });
             tr.appendChild(td);
         }
@@ -45,7 +54,6 @@ document.querySelector('#exec').addEventListener('click', function() {
     for (let k = 0; k < shuffle.length; k++) { // ex 49
         const col = Math.floor(shuffle[k] / 10); // ex 4
         const row = shuffle[k] % 10; // ex 9
-        console.log(col, row);
         tbody.children[col].children[row].textContent = 'X'; // ex 화면상 4행 9열에 'X' 표시
         dataset[col][row] = 'X';
     }
