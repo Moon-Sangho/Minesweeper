@@ -26,7 +26,7 @@ document.querySelector('#exec').addEventListener('click', function() {
         const tr = document.createElement('tr');
         dataset.push(arr);
         for (var j = 0; j < hor; j++) {
-            arr.push(1);
+            arr.push(0);
             const td = document.createElement('td');
             // 테이블 우클릭 시 !, ?, '' 변환
             td.addEventListener('contextmenu', function(e) {
@@ -54,9 +54,12 @@ document.querySelector('#exec').addEventListener('click', function() {
                 const parentTbody = e.currentTarget.parentNode.parentNode;
                 const indexTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 const indexTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+                
                 e.currentTarget.classList.add('opened');
                 if (dataset[indexTr][indexTd] === 'X') {
                     e.currentTarget.textContent = '💣';
+
+                // 주변 지뢰 개수 표시    
                 } else {
                     let near = [
                         dataset[indexTr][indexTd-1], dataset[indexTr][indexTd+1]    
@@ -99,11 +102,18 @@ document.querySelector('#exec').addEventListener('click', function() {
                                 tbody.children[indexTr + 1].children[indexTd + 1]
                             ]);
                         }
-
+                        
+                        dataset[indexTr][indexTd] = 1;
                         nearTd.filter(function(v) {
                             return !!v;
                         }).forEach(function(nextTd) {
-                            nextTd.click();
+                            const parentTr = nextTd.parentNode;
+                            const parentTbody = nextTd.parentNode.parentNode;
+                            const nextTdTd = Array.prototype.indexOf.call(parentTr.children, nextTd);
+                            const nextTdTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+                            if (dataset[nextTdTr][nextTdTd] !== 1) {
+                                nextTd.click();
+                            }
                         });
                     }
                 }
