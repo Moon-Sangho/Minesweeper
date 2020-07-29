@@ -1,8 +1,9 @@
 const tbody = document.querySelector('#table tbody');
-const dataset = [];
+let dataset = [];
 
 document.querySelector('#exec').addEventListener('click', function() {
     tbody.innerHTML = ''; // 실행 버튼 클릭 시 지뢰 테이블 초기화
+    dataset = []; // 실행 버튼 클릭 시 dataset 초기화
     const hor = parseInt(document.querySelector('#hor').value);
     const ver = parseInt(document.querySelector('#ver').value);
     const mine = parseInt(document.querySelector('#mine').value);
@@ -46,27 +47,65 @@ document.querySelector('#exec').addEventListener('click', function() {
                     }
                 }
             });
-            // 테이블 좌클릭 시 지뢰 표시 및 주변 지뢰 개수 표시
+            // 테이블 좌클릭 시 지뢰 표시, 주변 지뢰 개수 표시, 칸 흰색으로 바꾸기,
+            // 좌클릭 시 지뢰 개수가 0일 경우, 0 주변칸 동시 오픈
             td.addEventListener('click', function(e) {
                 const parentTr = e.currentTarget.parentNode;
                 const parentTbody = e.currentTarget.parentNode.parentNode;
                 const indexTd = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 const indexTr = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+                e.currentTarget.classList.add('opened');
                 if (dataset[indexTr][indexTd] === 'X') {
                     e.currentTarget.textContent = '💣';
                 } else {
-                    const near = [
+                    let near = [
                         dataset[indexTr][indexTd-1], dataset[indexTr][indexTd+1]    
                     ];
+
                     if (dataset[indexTr-1]) {
                         near = near.concat(dataset[indexTr-1][indexTd-1], dataset[indexTr-1][indexTd], dataset[indexTr-1][indexTd+1]);
-                    } 
+                    }
+
                     if (dataset[indexTr+1]) {
                         near = near.concat(dataset[indexTr+1][indexTd-1], dataset[indexTr+1][indexTd], dataset[indexTr+1][indexTd+1]);
                     }
-                    e.currentTarget.textContent = near.filter(function(v) {
+
+                    let nearBombNumber = near.filter(function(v) {
                         return v === 'X';
                     }).length;
+                    e.currentTarget.textContent = nearBombNumber;
+
+                    //주변 8칸 동시 오픈(재귀 함수)
+                    if (nearBombNumber === 0) {
+                        let nearTd = [];
+
+                        if (tbody.children[indexTr - 1]) {
+                            nearTd = nearTd.concat([
+                                tbody.children[indexTr - 1].children[indexTd - 1],
+                                tbody.children[indexTr - 1].children[indexTd],
+                                tbody.children[indexTr - 1].children[indexTd + 1]
+                            ]);
+                        }
+
+                        nearTd = nearTd.concat([
+                            tbody.children[indexTr].children[indexTd - 1],
+                            tbody.children[indexTr].children[indexTd + 1]
+                        ]);
+
+                        if (tbody.children[indexTr + 1]) {
+                            nearTd = nearTd.concat([
+                                tbody.children[indexTr + 1].children[indexTd - 1],
+                                tbody.children[indexTr + 1].children[indexTd],
+                                tbody.children[indexTr + 1].children[indexTd + 1]
+                            ]);
+                        }
+
+                        nearTd.filter(function(v) {
+                            return !!v;
+                        }).forEach(function(nextTd) {
+                            nextTd.click();
+                        });
+                    }
                 }
             });
             tr.appendChild(td);
